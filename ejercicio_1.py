@@ -8,7 +8,7 @@ def main():
     if args.num > 0:
         oddlist = []
         for i in range(args.num):
-            if (args.num % 2) == 1:
+            if (i % 2) == 1:
                 oddlist.append(i)
     else:
         print("The number has to be positive")
