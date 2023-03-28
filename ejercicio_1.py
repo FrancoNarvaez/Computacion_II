@@ -10,9 +10,10 @@ def main():
         for i in range(args.num):
             if (i % 2) == 1:
                 oddlist.append(i)
+        print("odds numbers: ", oddlist)
     else:
         print("The number has to be positive")
-    print("odds numbers: ", oddlist)
+    
 
 
 if __name__ == "__main__":
