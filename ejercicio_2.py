@@ -1,6 +1,5 @@
 import argparse
 
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("text", help="write the text you want to repeat", type=str)
