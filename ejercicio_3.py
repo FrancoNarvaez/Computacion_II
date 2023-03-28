@@ -1,7 +1,6 @@
 import argparse
 import sys
 
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("file", help="indicate the file to count the number of words and lines", type=str)
