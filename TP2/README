@@ -1,0 +1,5 @@
+Para utilizar la aplicacion utilize por terminal el siguiente comando
+Primero Inicializar el servidor 
+python3 TP2_Servidor.py
+Segundo tener descargada la imagen a usar o copiar su Path en cuestion
+python3 TP2_Cliente.py -i (el Path de la imagen en cuestion)
