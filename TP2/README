@@ -1,0 +1,7 @@
+Para utilizar la aplicacion utilize por terminal el siguiente comando
+Primero Inicializar el servidor 
+python3 TP2_Servidor.py
+Seguindo Inicializar el servidorReducir.py 
+python3 TP2_ServidorReducir.py
+Segundo tener descargada la imagen a usar o copiar su Path en cuestion
+python3 TP2_Cliente.py -i (el Path de la imagen en cuestion) -s (un numero del tipo Float como 0.5 o 0.8)
