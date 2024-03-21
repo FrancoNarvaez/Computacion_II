@@ -1,0 +1,4 @@
+SERVER_IP = 'localhost'
+SERVER_PORT = 8080
+CLIENT_IP = 'localhost'
+CLIENT_PORT = 8080
