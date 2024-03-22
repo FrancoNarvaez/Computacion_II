@@ -1,12 +1,3 @@
-Quiero armar una app cli-serv que conecte las peticiones de un menu de restaurante o local de comida directamente 
-con el cocinero, evitando el uso de un mozo. Por lo tanto el cliente tendra un menu con distintas opciones, 
-seleccionara aquellas que desee en las cantidades que desee y se las enviara al chef/chefs  El chef recibira distintas 
-peticiones las cuales completara cuando esten listas o cancelara si hay algun inconveniente con ellas
-Ademas el chef podra cambiar los estados de las comidas por falta de stock o porque no es horario de dicha comida 
-(desayunos =! almuerzo y cena) Se usa concuerrencia en que multiples clientes pueden mandar peticiones al servidor y 
-que los chefs pueden sacar distintos pedidos. Se usa paralelismo en caso de que exista mas de un chef creando 
-una lista de peticiones y cada chef tomando de la lista un pedido. Van a existir distintos tipos chefs para distintas
-tareas, por lo tanto un pedido podria ser tomado por multiples chefs. 
 
 ---
 
