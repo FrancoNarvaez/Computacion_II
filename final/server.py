@@ -1,15 +1,31 @@
 from config import *
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 import json
+from cocina import prepare_order, check_ingredients, app
+import uuid
+from celery import chain
+
 
 
 class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
-        if self.path == '/menu':
+        if self.path.startswith('/status/'):
+            # Extrae el id de la tarea de la URL
+            task_id = self.path.strip('/status/')
+
+            # Obtiene el resultado de la tarea
+            result = app.AsyncResult(task_id)
+
+            # Si la tarea se ha completado, obtén el resultado
+            if result.ready():
+                response_message = result.get().encode()
+            else:
+                response_message = b"En proceso"
+
             self.send_response(200)
-            self.send_header('Content-type', 'text/plain')
+            self.send_header('Content-type', 'application/json')
             self.end_headers()
-            self.wfile.write(b"Menu del restaurante:\n- Pizza\n- Hamburguesa\n- Ensalada")
+            self.wfile.write(response_message)
         else:
             self.send_response(404)
             self.end_headers()
@@ -21,17 +37,25 @@ class RequestHandler(BaseHTTPRequestHandler):
             post_data = self.rfile.read(content_length)
             params = json.loads(post_data.decode('utf-8'))
 
+            # Genera un id_pedido
+            id_pedido = str(uuid.uuid4())
+            params['id_pedido'] = id_pedido
+
             # Procesa el pedido
             for producto_dict in params['productos']:
                 producto = producto_dict['producto']
                 cantidad = producto_dict['cantidad']
-            # Aquí aplicar la lógica para procesar el pedido, como si existe, si quedan ingredientes, etc.
 
-            # Responder al cliente con el estado del pedido
+            # Encadena las tareas
+            workflow = chain(check_ingredients.s(params), prepare_order.s())
+            # Ejecuta la cadena de tareas
+            result = workflow.apply_async()
+
+            # Devuelve inmediatamente una respuesta al cliente con el id de la tarea
             self.send_response(200)
-            self.send_header('Content-type', 'text/plain')
+            self.send_header('Content-type', 'application/json')
             self.end_headers()
-            self.wfile.write(b"Pedido recibido y en proceso")
+            self.wfile.write(result.id.encode())
         else:
             self.send_response(404)
             self.end_headers()
@@ -49,4 +73,3 @@ def start_http_server():
 
 if __name__ == "__main__":
     start_http_server()
-
