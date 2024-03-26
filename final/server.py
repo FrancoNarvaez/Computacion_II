@@ -6,10 +6,32 @@ import uuid
 from celery import chain
 
 
-
 class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
-        if self.path.startswith('/status/'):
+        if self.path.startswith('/menu') or self.path == '/':
+            menu = {
+                'productos': [
+                    {
+                        'nombre': 'Hamburguesa',
+                        'precio': 5
+                    },
+                    {
+                        'nombre': 'Pizza',
+                        'precio': 7
+                    },
+                    {
+                        'nombre': 'Ensalada',
+                        'precio': 3
+                    }
+                ]
+            }
+
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps(menu).encode())
+
+        elif self.path.startswith('/status/'):
             # Extrae el id de la tarea de la URL
             task_id = self.path.strip('/status/')
 
@@ -67,7 +89,7 @@ def start_http_server():
 
     httpd = ThreadingHTTPServer(server_address, RequestHandler)
 
-    print(f'Starting HTTP server on {SERVER_IP}:{SERVER_PORT}')
+    print(f'Starting HTTP server on {SERVER_IP}:{SERVER_PORT}\n')
     httpd.serve_forever()
 
 

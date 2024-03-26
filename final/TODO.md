@@ -26,3 +26,4 @@ Este documento contiene una lista de tareas pendientes y completadas para el pro
 - [ ] Crear un script de instalación para el cliente.
 - [ ] Agregar en el config.py la configuración de redis.
 - [ ] Crear un documento de que enseñe el uso de la aplicación completa.
+- [ ] Meter las funciones del cliente dentro de utils.py y darle los parametros de config.py

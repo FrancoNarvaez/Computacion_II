@@ -4,15 +4,33 @@ import json
 import time
 
 
+def send_get_request():
+    server_address = CLIENT2_IP
+    server_port = CLIENT2_PORT
+
+    conn = http.client.HTTPConnection(server_address, server_port)
+
+    conn.request("GET", "/menu")
+
+    response = conn.getresponse()
+
+    data = response.read()
+
+    print("Response from server:")
+    print(data.decode('utf-8'))
+
+    conn.close()
+
+
 def send_post_request():
-    server_address = CLIENT_IP
-    server_port = CLIENT_PORT
+    server_address = CLIENT2_IP
+    server_port = CLIENT2_PORT
 
     conn = http.client.HTTPConnection(server_address, server_port)
 
     pedido = {
         'productos': [
-            {'producto': 'Hamburguesa', 'cantidad': 2}
+            {'producto': 'Pizza', 'cantidad': 2}
         ]
     }
 
@@ -21,7 +39,7 @@ def send_post_request():
 
     conn.request("POST", "/pedido", pedido_json, headers)
 
-    print("Pedido enviado")
+    print("\nPedido enviado")
     response = conn.getresponse()
 
     data = response.read()
@@ -36,8 +54,8 @@ def send_post_request():
 
 
 def get_task_status(task_id):
-    server_address = CLIENT_IP
-    server_port = CLIENT_PORT
+    server_address = CLIENT2_IP
+    server_port = CLIENT2_PORT
 
     while True:
         try:
@@ -49,7 +67,7 @@ def get_task_status(task_id):
 
             data = response.read()
 
-            print("Response from server:")
+            print("\nResponse from server:")
             print(data.decode('utf-8'))
             if data.decode('utf-8') == "Completado":
                 conn.close()
@@ -62,7 +80,6 @@ def get_task_status(task_id):
 
 
 if __name__ == "__main__":
+    send_get_request()
     task_id = send_post_request()
     get_task_status(task_id)
-
-

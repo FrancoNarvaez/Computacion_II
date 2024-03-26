@@ -3,12 +3,13 @@ import time
 
 app = Celery('tasks', broker='redis://localhost:6379/0', backend='redis://localhost:6379/0')
 
-# Diccionario para rastrear la cantidad de cada ingrediente disponible por ahora, luego sera una DB
+# Diccionario para rastrear la cantidad de cada ingrediente disponible por ahora, luego sera una DB si fuese necesario
 ingredientes = {
     'Hamburguesa': 10,
     'Pizza': 5,
     'Ensalada': 8
 }
+
 
 @app.task
 def check_ingredients(order):
@@ -24,8 +25,9 @@ def check_ingredients(order):
     # Si hay suficientes ingredientes para todos los productos, devuelve 'Suficiente'
     return 'En proceso'
 
+
 @app.task
 def prepare_order(order):
     # Simula la preparación del pedido con un tiempo de espera
-    time.sleep(10)
+    time.sleep(5)
     return "Completado"
