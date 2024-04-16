@@ -4,9 +4,18 @@ from utils import send_get_request, send_post_request, get_task_status
 
 pedido = {
     'productos': [
-        {'producto': 'Hamburguesa', 'cantidad': 2},
-        {'producto': 'Pizza', 'cantidad': 2},
-        {'producto': 'Ensalada', 'cantidad': 2},
+        {
+         'producto': 'Hamburguesa',
+         'cantidad': 2
+        },
+        {
+         'producto': 'Pizza',
+         'cantidad': 2
+        },
+        {
+         'producto': 'Ensalada',
+         'cantidad': 2
+        }
     ]
 }
 

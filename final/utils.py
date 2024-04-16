@@ -71,7 +71,7 @@ def get_task_status(cliente_ip, cliente_port, task_id):
                 conn.close()
                 break
             conn.close()
-            time.sleep(3)  # Espera 3 segundos antes de consultar de nuevo
+            time.sleep(7)  # Espera 3 segundos antes de consultar de nuevo
         except http.client.RemoteDisconnected:
             print("Server disconnected. Retrying in 5 seconds...")
-            time.sleep(3)
+            time.sleep(5)

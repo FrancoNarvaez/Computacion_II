@@ -1,7 +1,8 @@
+import time
 from config import *
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 import json
-from cocina import prepare_order, check_ingredients, app
+from cocina import prepare_order, check_ingredients, app, handle_result
 import uuid
 from celery import chain
 
@@ -17,11 +18,35 @@ class RequestHandler(BaseHTTPRequestHandler):
                     },
                     {
                         'nombre': 'Pizza',
-                        'precio': 7
+                        'precio': 4
                     },
                     {
                         'nombre': 'Ensalada',
+                        'precio': 2
+                    },
+                    {
+                        'nombre': 'Refresco',
+                        'precio': 1
+                    },
+                    {
+                        'nombre': 'Agua',
+                        'precio': 1
+                    },
+                    {
+                        'nombre': 'Milanesa',
+                        'precio': 5
+                    },
+                    {
+                        'nombre': 'Papas fritas',
+                        'precio': 2
+                    },
+                    {
+                        'nombre': 'Hot dog',
                         'precio': 3
+                    },
+                    {
+                        'nombre': 'Tacos',
+                        'precio': 5
                     }
                 ]
             }
@@ -38,26 +63,12 @@ class RequestHandler(BaseHTTPRequestHandler):
             # Obtiene el resultado de la tarea
             result = app.AsyncResult(task_id)
 
-            # Si la tarea se ha completado, obtén el resultado
-            if result.ready():
-                response_message = result.get().encode()
-            else:
-                response_message = b"En proceso"
-
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            self.wfile.write(response_message)
-        else:
-            self.send_response(404)
-            self.end_headers()
-            self.wfile.write(b"Error 404: Not Found")
-
     def do_POST(self):
         if self.path == '/pedido':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
             params = json.loads(post_data.decode('utf-8'))
+
 
             # Genera un id_pedido
             id_pedido = str(uuid.uuid4())
@@ -69,9 +80,10 @@ class RequestHandler(BaseHTTPRequestHandler):
                 cantidad = producto_dict['cantidad']
 
             # Encadena las tareas
-            workflow = chain(check_ingredients.s(params), prepare_order.s())
+            workflow = chain(check_ingredients.s(params), prepare_order.s().link(handle_result.s()))
             # Ejecuta la cadena de tareas
-            result = workflow.apply_async()
+            result = workflow.delay()
+
 
             # Devuelve inmediatamente una respuesta al cliente con el id de la tarea
             self.send_response(200)
