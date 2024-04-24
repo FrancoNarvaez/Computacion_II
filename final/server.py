@@ -2,7 +2,7 @@ import time
 from config import *
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 import json
-from cocina import prepare_order, check_ingredients, app, handle_result
+from cocina import prepare_order, check_ingredients, app
 import uuid
 from celery import chain
 
@@ -63,6 +63,23 @@ class RequestHandler(BaseHTTPRequestHandler):
             # Obtiene el resultado de la tarea
             result = app.AsyncResult(task_id)
 
+            if result.ready():
+                # Si la tarea está lista, obtén el resultado
+                task_result = result.result
+
+                # Envía el resultado al cliente
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps(task_result).encode())
+
+            else:
+                # Si la tarea no está lista, envía el estado de la tarea al cliente
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"status": result.state}).encode())
+
     def do_POST(self):
         if self.path == '/pedido':
             content_length = int(self.headers['Content-Length'])
@@ -80,8 +97,8 @@ class RequestHandler(BaseHTTPRequestHandler):
                 cantidad = producto_dict['cantidad']
 
             # Encadena las tareas
-            workflow = chain(check_ingredients.s(params), prepare_order.s().link(handle_result.s()))
-            # Ejecuta la cadena de tareas
+
+            workflow = chain(check_ingredients.s(params), prepare_order.s())
             result = workflow.delay()
 
 

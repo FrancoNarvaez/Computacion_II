@@ -65,13 +65,19 @@ def get_task_status(cliente_ip, cliente_port, task_id):
 
             data = response.read()
 
+            # Decodifica la respuesta JSON
+            task_data = json.loads(data.decode('utf-8'))
+
             print("\nResponse from server:")
-            print(data.decode('utf-8'))
-            if data.decode('utf-8') == "Completado":
+            print(task_data)
+
+            # Verifica el estado del pedido
+            if task_data.get('estado') == 'Completado':
                 conn.close()
                 break
+
             conn.close()
-            time.sleep(7)  # Espera 3 segundos antes de consultar de nuevo
+            time.sleep(20)  # Espera 20 segundos antes de consultar de nuevo
         except http.client.RemoteDisconnected:
             print("Server disconnected. Retrying in 5 seconds...")
             time.sleep(5)

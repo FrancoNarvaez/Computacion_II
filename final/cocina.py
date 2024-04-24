@@ -2,6 +2,7 @@ from celery import Celery, group
 import time
 
 app = Celery('tasks', broker='redis://localhost:6379/0', backend='redis://localhost:6379/0')
+app.conf.broker_connection_retry_on_startup = True
 
 # Diccionario para rastrear la cantidad de cada ingrediente disponible por ahora, luego sera una DB si fuese necesario
 ingredientes = {
@@ -30,7 +31,7 @@ def check_ingredients(order):
             return order
 
     # Si hay suficientes ingredientes para todos los productos, establece el estado a 'En proceso'
-    order['estado'] = 'En proceso'
+    order['estado'] = 'Por preparar'
     return order
 
 
@@ -38,174 +39,182 @@ def check_ingredients(order):
 def prepare_ensalada(order):
     # Simula la preparación del pedido con un tiempo de espera
     time.sleep(5)
-    print("Ensalada preparada")
     for product in order['productos']:
         if product['producto'] == 'Ensalada':
+            print("Ensalada preparada")
             product['estado'] = 'Completado'
-    return order
+    return all(product.get('estado') == 'Completado' for product in order['productos'])
 
 
 @app.task
 def prepare_hamburgesa(order):
     # Simula la preparación del pedido con un tiempo de espera
     time.sleep(5)
-    print("Hamburguesa preparada")
     for product in order['productos']:
         if product['producto'] == 'Hamburguesa':
+            print("Hamburguesa preparada")
             product['estado'] = 'Completado'
-    return order
+        return all(product.get('estado') == 'Completado' for product in order['productos'])
 
 
 @app.task
 def prepare_pizza(order):
     # Simula la preparación del pedido con un tiempo de espera
     time.sleep(5)
-    print("Pizza preparada")
     for product in order['productos']:
         if product['producto'] == 'Pizza':
+            print("Pizza preparada")
             product['estado'] = 'Completado'
-    return order
+        return all(product.get('estado') == 'Completado' for product in order['productos'])
 
 
 @app.task
 def prepare_refresco(order):
     # Simula la preparación del pedido con un tiempo de espera
     time.sleep(5)
-    print("Refresco preparado")
     for product in order['productos']:
         if product['producto'] == 'Refresco':
+            print("Refresco preparado")
             product['estado'] = 'Completado'
-    return order
+        return all(product.get('estado') == 'Completado' for product in order['productos'])
 
 
 @app.task
 def prepare_agua(order):
     # Simula la preparación del pedido con un tiempo de espera
     time.sleep(5)
-    print("Agua preparada")
     for product in order['productos']:
         if product['producto'] == 'Agua':
+            print("Agua preparada")
             product['estado'] = 'Completado'
-    return order
+        return all(product.get('estado') == 'Completado' for product in order['productos'])
 
 
 @app.task
 def prepare_milanesa(order):
     # Simula la preparación del pedido con un tiempo de espera
     time.sleep(5)
-    print("Milanesa preparada")
     for product in order['productos']:
         if product['producto'] == 'Milanesa':
+            print("Milanesa preparada")
             product['estado'] = 'Completado'
-            print("Siguinte producto")
-    return order
+        return all(product.get('estado') == 'Completado' for product in order['productos'])
 
 
 @app.task
 def prepare_papas_fritas(order):
     # Simula la preparación del pedido con un tiempo de espera
     time.sleep(5)
-    print("Papas fritas preparadas")
     for product in order['productos']:
         if product['producto'] == 'Papas fritas':
+            print("Papas fritas preparadas")
             product['estado'] = 'Completado'
-            print("Siguinte producto")
-    return order
+        return all(product.get('estado') == 'Completado' for product in order['productos'])
 
 
 @app.task
 def prepare_hot_dog(order):
     # Simula la preparación del pedido con un tiempo de espera
     time.sleep(5)
-    print("Hot dog preparado")
     for product in order['productos']:
         if product['producto'] == 'Hot dog':
+            print("Hot dog preparado")
             product['estado'] = 'Completado'
-            print("Siguinte producto")
-    return order
+        return all(product.get('estado') == 'Completado' for product in order['productos'])
 
 
 @app.task
 def prepare_tacos(order):
     # Simula la preparación del pedido con un tiempo de espera
     time.sleep(5)
-    print("Tacos preparados")
     for product in order['productos']:
         if product['producto'] == 'Tacos':
+            print("Tacos preparados")
             product['estado'] = 'Completado'
-            print("Siguinte producto")
-    return order
+        return all(product.get('estado') == 'Completado' for product in order['productos'])
 
 
 @app.task
-def prepare_order(order, callback=None):
+def prepare_order(order):
     print("voy a prepara la orden")
 
     # Si hay suficientes ingredientes, inicia la preparación del pedido
-    if order['estado'] == 'En proceso':
+    if order['estado'] == 'Por preparar':
+        print("Orden numero \n")
+        print(order['id_pedido'])
+        print("en preparacion")
         # Crea una lista de tareas para cada producto en el pedido
         tasks = []
         for product in order['productos']:
             match product['producto']:
                 case 'Hamburguesa':
+                    print("Toca preparar hamburgesa")
                     tasks.append(prepare_hamburgesa.s(order))
                 case 'Pizza':
+                    print("Toca preparar Pizza")
                     tasks.append(prepare_pizza.s(order))
                 case 'Ensalada':
+                    print("Toca preparar Ensaladas")
                     tasks.append(prepare_ensalada.s(order))
                 case 'Refresco':
+                    print("Toca sacar Refrescos")
                     tasks.append(prepare_refresco.s(order))
                 case 'Agua':
+                    print("Toca sacar agua")
                     tasks.append(prepare_agua.s(order))
                 case 'Milanesa':
+                    print("Toca preparar milanesas")
                     tasks.append(prepare_milanesa.s(order))
                 case 'Papas fritas':
+                    print("Toca preparar papas fritas")
                     tasks.append(prepare_papas_fritas.s(order))
                 case 'Hot dog':
+                    print("Toca preparar hots dogs")
                     tasks.append(prepare_hot_dog.s(order))
                 case 'Tacos':
+                    print("Toca preparar Tacos")
                     tasks.append(prepare_tacos.s(order))
                 case _:
                     print("Producto no reconocido")
 
         print("Todas las ordenes pedidas\n")
         # Ejecuta todas las tareas en paralelo y luego ejecuta verify_order
-        job = group(*tasks) | verify_order.s(order)
-        return job
+        job = group(*tasks)
+        results = job.apply_async()
+        for result in results.results:
+            while not result.state == 'SUCCESS':
+                if result.state == 'PENDING':
+                    print("Orden en espera")
+                    time.sleep(5)
+
+                elif result.state == 'STARTED':
+                    print("Orden en proceso")
+                    time.sleep(5)
+
+                elif result.state == 'RETRY':
+                    print("Reintentando la orden")
+                    time.sleep(5)
+
+                elif result.state == 'FAILURE':
+                    print("Error en la preparacion de la orden")
+                    return False
+
+                elif result.state == 'SUCCESS':
+                    print("Orden completada")
+                    break
+
+        # Verifica si todas las tareas han terminado
+        if all(result.ready() for result in results.results):
+            print("Resultados de la orden\n")
+            if all(result.successful() for result in results.results):
+                results = [result.result for result in results.results if result.ready()]
+                if all(result for result in results):
+                    order['estado'] = 'Completado'
+                else:
+                    order['estado'] = 'Error'
+                return order
+
     else:
         print("No se puede preparar la orden debido a ingredientes insuficientes")
-        return
-
-
-@app.task
-def verify_order(results, order):
-    final_order = order.copy()
-    # Crea un diccionario para rastrear los estados de los productos
-    product_status = {}
-    for result in results:
-        for product in result['productos']:
-            if 'estado' in product:
-                product_status[product['producto']] = product['estado']
-
-    # Actualiza el estado de los productos en final_order
-    for product in final_order['productos']:
-        if product['producto'] in product_status:
-            product['estado'] = product_status[product['producto']]
-
-    # Verifica si todos los productos están completados
-    if all(product['estado'] == 'Completado' for product in final_order['productos']):
-        final_order['estado'] = 'Completado'
-        print("Orden completada\nFinal orden:", final_order)
-    else:
-        final_order['estado'] = 'Error'
-
-    return final_order
-
-
-@app.task(bind=True)
-def handle_result(self, results):
-    # Obtiene y muestra el resultado de la tarea
-    print("Pedido completado:")
-    final_order = results
-    print(final_order)
-    return final_order
+        order['estado'] = 'Error'
+        return order
