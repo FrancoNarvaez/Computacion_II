@@ -43,7 +43,7 @@ def prepare_ensalada(order):
         if product['producto'] == 'Ensalada':
             print("Ensalada preparada")
             product['estado'] = 'Completado'
-    return all(product.get('estado') == 'Completado' for product in order['productos'])
+    return order
 
 
 @app.task
@@ -54,7 +54,8 @@ def prepare_hamburgesa(order):
         if product['producto'] == 'Hamburguesa':
             print("Hamburguesa preparada")
             product['estado'] = 'Completado'
-        return all(product.get('estado') == 'Completado' for product in order['productos'])
+
+        return order
 
 
 @app.task
@@ -65,7 +66,8 @@ def prepare_pizza(order):
         if product['producto'] == 'Pizza':
             print("Pizza preparada")
             product['estado'] = 'Completado'
-        return all(product.get('estado') == 'Completado' for product in order['productos'])
+
+        return order
 
 
 @app.task
@@ -76,7 +78,8 @@ def prepare_refresco(order):
         if product['producto'] == 'Refresco':
             print("Refresco preparado")
             product['estado'] = 'Completado'
-        return all(product.get('estado') == 'Completado' for product in order['productos'])
+
+        return order
 
 
 @app.task
@@ -87,7 +90,7 @@ def prepare_agua(order):
         if product['producto'] == 'Agua':
             print("Agua preparada")
             product['estado'] = 'Completado'
-        return all(product.get('estado') == 'Completado' for product in order['productos'])
+        return order
 
 
 @app.task
@@ -98,7 +101,7 @@ def prepare_milanesa(order):
         if product['producto'] == 'Milanesa':
             print("Milanesa preparada")
             product['estado'] = 'Completado'
-        return all(product.get('estado') == 'Completado' for product in order['productos'])
+        return order
 
 
 @app.task
@@ -109,7 +112,7 @@ def prepare_papas_fritas(order):
         if product['producto'] == 'Papas fritas':
             print("Papas fritas preparadas")
             product['estado'] = 'Completado'
-        return all(product.get('estado') == 'Completado' for product in order['productos'])
+        return order
 
 
 @app.task
@@ -120,7 +123,7 @@ def prepare_hot_dog(order):
         if product['producto'] == 'Hot dog':
             print("Hot dog preparado")
             product['estado'] = 'Completado'
-        return all(product.get('estado') == 'Completado' for product in order['productos'])
+        return order
 
 
 @app.task
@@ -131,14 +134,13 @@ def prepare_tacos(order):
         if product['producto'] == 'Tacos':
             print("Tacos preparados")
             product['estado'] = 'Completado'
-        return all(product.get('estado') == 'Completado' for product in order['productos'])
+
+        return order
 
 
 @app.task
 def prepare_order(order):
     print("voy a prepara la orden")
-
-    # Si hay suficientes ingredientes, inicia la preparación del pedido
     if order['estado'] == 'Por preparar':
         print("Orden numero \n")
         print(order['id_pedido'])
@@ -181,40 +183,59 @@ def prepare_order(order):
         # Ejecuta todas las tareas en paralelo y luego ejecuta verify_order
         job = group(*tasks)
         results = job.apply_async()
-        for result in results.results:
-            while not result.state == 'SUCCESS':
-                if result.state == 'PENDING':
-                    print("Orden en espera")
-                    time.sleep(5)
+        status = check_status(results)
+        finish = verify_order(order)
+        max_attempts = 10
+        attempts = 0
+        while not finish or attempts < max_attempts:
+            time.sleep(3)
+            status = check_status(results)
+            finish = verify_order(order)
+            print("Estado de la orden actual: ", status)
 
-                elif result.state == 'STARTED':
-                    print("Orden en proceso")
-                    time.sleep(5)
+        return status
 
-                elif result.state == 'RETRY':
-                    print("Reintentando la orden")
-                    time.sleep(5)
 
-                elif result.state == 'FAILURE':
-                    print("Error en la preparacion de la orden")
-                    return False
+def check_status(results):
+    status = ''
+    max_attempts = 10
+    attempts = 0
 
-                elif result.state == 'SUCCESS':
-                    print("Orden completada")
-                    break
+    for result in results.results:
+        while not result.state == 'SUCCESS' and attempts < max_attempts:
+            if result.state == 'PENDING':
+                status = "Orden en espera"
+            elif result.state == 'STARTED':
+                status = "Orden en proceso"
+            elif result.state == 'RETRY':
+                status = "Reintentando la orden"
+            elif result.state == 'FAILURE':
+                status = "Error en la preparacion de la orden"
+            elif result.state == 'SUCCESS':
+                status = "Orden completada"
+            else:
+                status = "Estado desconocido"
 
-        # Verifica si todas las tareas han terminado
-        if all(result.ready() for result in results.results):
-            print("Resultados de la orden\n")
-            if all(result.successful() for result in results.results):
-                results = [result.result for result in results.results if result.ready()]
-                if all(result for result in results):
-                    order['estado'] = 'Completado'
-                else:
-                    order['estado'] = 'Error'
-                return order
+            time.sleep(3)
+            print('Verificando estado de la orden ...')
+            print(status)
+            attempts += 1
 
-    else:
-        print("No se puede preparar la orden debido a ingredientes insuficientes")
-        order['estado'] = 'Error'
-        return order
+        if attempts == max_attempts:
+            status = "Tiempo de espera excedido"
+        return status
+
+
+def verify_order(order):
+    print('Verificando orden ...')
+    max_attempts = 10
+    attempts = 0
+
+    while attempts < max_attempts:
+        if all(product.get('estado') == 'Completado' for product in order['productos']):
+            order['estado'] = 'Completado'
+            return True
+        time.sleep(3)
+        attempts += 1
+    order['estado'] = 'Error'
+    return False
