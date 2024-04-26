@@ -1,10 +1,24 @@
+from order import Order
 from config import *
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 import json
 from configRedis import app
 import uuid
 from celery import chain
+from prepare import prepare_ensalada, prepare_hamburguesa, prepare_pizza, prepare_refresco, prepare_agua, prepare_milanesa, prepare_papas_fritas, prepare_hot_dog, prepare_tacos
 
+# Mapea los nombres de los productos a las funciones de preparación
+product_to_function = {
+    'Ensalada': prepare_ensalada,
+    'Hamburguesa': prepare_hamburguesa,
+    'Pizza': prepare_pizza,
+    'Refresco': prepare_refresco,
+    'Agua': prepare_agua,
+    'Milanesa': prepare_milanesa,
+    'Papas fritas': prepare_papas_fritas,
+    'Hot dog': prepare_hot_dog,
+    'Tacos': prepare_tacos
+}
 
 
 class RequestHandler(BaseHTTPRequestHandler):
@@ -96,9 +110,10 @@ class RequestHandler(BaseHTTPRequestHandler):
                 producto = producto_dict['producto']
                 cantidad = producto_dict['cantidad']
 
-            # Encadena las tareas
+            order = Order(params)
 
-            workflow = chain(check_ingredients.s(params), prepare_order.s())
+            # Encadena las tareas
+            workflow = chain(order.check_ingredients.s(self), order.prepare.s(product_to_function))
             result = workflow.delay()
 
 

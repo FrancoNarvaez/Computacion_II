@@ -2,12 +2,14 @@ from celery import group
 import time
 from despensa import ingredientes
 from celery.result import AsyncResult
+from configRedis import app
 
 
 class Order:
     def __init__(self, order_dict):
         self.order_dict = order_dict
 
+    @app.task
     def check_ingredients(self):
         # Verifica si hay suficientes ingredientes para cada producto en el pedido
         for producto_dict in self.order_dict['productos']:
@@ -23,6 +25,7 @@ class Order:
         self.order_dict['estado'] = 'Por preparar'
         return self.order_dict
 
+    @app.task
     def prepare(self, product_to_function):
         print("voy a prepara la orden")
         if self.order_dict['estado'] == 'Por preparar':
