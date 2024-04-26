@@ -1,10 +1,10 @@
-import time
 from config import *
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 import json
-from cocina import prepare_order, check_ingredients, app
+from configRedis import app
 import uuid
 from celery import chain
+
 
 
 class RequestHandler(BaseHTTPRequestHandler):
