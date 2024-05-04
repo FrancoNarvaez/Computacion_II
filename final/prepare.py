@@ -1,6 +1,8 @@
 import time
+from celery_app import app
 
 
+@app.task
 def prepare_ensalada(product):
     time.sleep(5)
     if product['producto'] == 'Ensalada':
@@ -10,6 +12,7 @@ def prepare_ensalada(product):
         return product['producto'], product['estado']
 
 
+@app.task
 def prepare_hamburguesa(product):
     time.sleep(15)
     if product['producto'] == 'Hamburguesa':
@@ -19,6 +22,7 @@ def prepare_hamburguesa(product):
         return product['producto'], product['estado']
 
 
+@app.task
 def prepare_pizza(product):
     time.sleep(5)
     if product['producto'] == 'Pizza':
@@ -28,6 +32,7 @@ def prepare_pizza(product):
         return product['producto'], product['estado']
 
 
+@app.task
 def prepare_refresco(product):
     time.sleep(5)
     if product['producto'] == 'Refresco':
@@ -36,6 +41,7 @@ def prepare_refresco(product):
         return product['producto'], product['estado']
 
 
+@app.task
 def prepare_agua(product):
     time.sleep(5)
     if product['producto'] == 'Agua':
@@ -44,6 +50,7 @@ def prepare_agua(product):
         return product['producto'], product['estado']
 
 
+@app.task
 def prepare_milanesa(product):
     time.sleep(5)
     if product['producto'] == 'Milanesa':
@@ -52,6 +59,7 @@ def prepare_milanesa(product):
         return product['producto'], product['estado']
 
 
+@app.task
 def prepare_papas_fritas(product):
     time.sleep(5)
     if product['producto'] == 'Papas fritas':
@@ -60,6 +68,7 @@ def prepare_papas_fritas(product):
         return product['producto'], product['estado']
 
 
+@app.task
 def prepare_hot_dog(product):
     time.sleep(5)
     if product['producto'] == 'Hot dog':
@@ -68,6 +77,7 @@ def prepare_hot_dog(product):
         return product['producto'], product['estado']
 
 
+@app.task
 def prepare_tacos(product):
     time.sleep(5)
     if product['producto'] == 'Tacos':

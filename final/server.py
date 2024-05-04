@@ -1,28 +1,17 @@
 from order import Order
-from config import *
+from config import SERVER_PORT
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 import json
-from configRedis import app
+from task import app, check_ingredients, prepare
 import uuid
 from celery import chain
-from prepare import prepare_ensalada, prepare_hamburguesa, prepare_pizza, prepare_refresco, prepare_agua, prepare_milanesa, prepare_papas_fritas, prepare_hot_dog, prepare_tacos
-
-# Mapea los nombres de los productos a las funciones de preparación
-product_to_function = {
-    'Ensalada': prepare_ensalada,
-    'Hamburguesa': prepare_hamburguesa,
-    'Pizza': prepare_pizza,
-    'Refresco': prepare_refresco,
-    'Agua': prepare_agua,
-    'Milanesa': prepare_milanesa,
-    'Papas fritas': prepare_papas_fritas,
-    'Hot dog': prepare_hot_dog,
-    'Tacos': prepare_tacos
-}
+import socket
 
 
 class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
+        client_ip = self.client_address[0]
+        print(f"Cliente conectado desde la IP: {client_ip}")
         if self.path.startswith('/menu') or self.path == '/':
             menu = {
                 'productos': [
@@ -95,27 +84,22 @@ class RequestHandler(BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps({"status": result.state}).encode())
 
     def do_POST(self):
+        client_ip = self.client_address[0]
+        print(f"Cliente conectado desde la IP: {client_ip}")
         if self.path == '/pedido':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
             params = json.loads(post_data.decode('utf-8'))
 
-
             # Genera un id_pedido
             id_pedido = str(uuid.uuid4())
             params['id_pedido'] = id_pedido
 
-            # Procesa el pedido
-            for producto_dict in params['productos']:
-                producto = producto_dict['producto']
-                cantidad = producto_dict['cantidad']
-
             order = Order(params)
 
             # Encadena las tareas
-            workflow = chain(order.check_ingredients.s(self), order.prepare.s(product_to_function))
+            workflow = chain(check_ingredients.s(order.order_dict), prepare.s())
             result = workflow.delay()
-
 
             # Devuelve inmediatamente una respuesta al cliente con el id de la tarea
             self.send_response(200)
@@ -128,12 +112,22 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(b"Error 404: Not Found")
 
 
+class DualStackServer(ThreadingHTTPServer):
+    def server_bind(self):
+        # Configura el socket para ser reutilizable
+        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        if self.address_family == socket.AF_INET6:
+            # Si estamos utilizando IPv6, configura el socket para aceptar conexiones IPv4 también
+            self.socket.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_V6ONLY, 0)
+        ThreadingHTTPServer.server_bind(self)
+
+
 def start_http_server():
-    server_address = (SERVER_IP, SERVER_PORT)
+    server_address = ('', SERVER_PORT)
 
-    httpd = ThreadingHTTPServer(server_address, RequestHandler)
+    httpd = DualStackServer(server_address, RequestHandler)
 
-    print(f'Starting HTTP server on {SERVER_IP}:{SERVER_PORT}\n')
+    print(f'Starting HTTP server on port {SERVER_PORT}\n')
     httpd.serve_forever()
 
 

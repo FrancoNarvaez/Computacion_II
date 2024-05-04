@@ -1,6 +1,5 @@
-from config import *
 from utils import send_get_request, send_post_request, get_task_status
-
+from config import CLIENTS
 
 pedido = {
     'productos': [
@@ -20,6 +19,6 @@ pedido = {
 }
 
 if __name__ == "__main__":
-    send_get_request(CLIENT_IP, CLIENT_PORT)
-    task_id = send_post_request(CLIENT_IP, CLIENT_PORT, pedido)
-    get_task_status(CLIENT_IP, CLIENT_PORT, task_id)
+    send_get_request(CLIENTS[0]['ip'], CLIENTS[0]['port'])
+    task_id = send_post_request(CLIENTS[0]['ip'], CLIENTS[0]['port'], pedido)
+    get_task_status(CLIENTS[0]['ip'], CLIENTS[0]['port'], task_id)

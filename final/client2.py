@@ -1,4 +1,4 @@
-from config import *
+from config import CLIENTS
 from utils import send_get_request, send_post_request, get_task_status
 
 pedido = {
@@ -9,6 +9,6 @@ pedido = {
 
 
 if __name__ == "__main__":
-    send_get_request(CLIENT2_IP, CLIENT2_PORT)
-    task_id = send_post_request(CLIENT2_IP, CLIENT2_PORT, pedido)
-    get_task_status(CLIENT2_IP, CLIENT2_PORT, task_id)
+    send_get_request(CLIENTS[1]['ip'], CLIENTS[1]['port'])
+    task_id = send_post_request(CLIENTS[1]['ip'], CLIENTS[1]['port'], pedido)
+    get_task_status(CLIENTS[1]['ip'], CLIENTS[1]['port'], task_id)
