@@ -1,17 +1,19 @@
-from order import Order
-from config import SERVER_PORT
-from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
-import json
-from task import app, check_ingredients, prepare
-import uuid
-from celery import chain
 import socket
+import json
+import uuid
+import logging
+from order import Order
+from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
+from task import app, check_ingredients, prepare
+from celery import chain
+
+logging.basicConfig(level=logging.INFO)
 
 
 class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         client_ip = self.client_address[0]
-        print(f"Cliente conectado desde la IP: {client_ip}")
+        logging.info(f"Cliente conectado desde la IP: {client_ip}")
         if self.path.startswith('/menu') or self.path == '/':
             menu = {
                 'productos': [
@@ -85,7 +87,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         client_ip = self.client_address[0]
-        print(f"Cliente conectado desde la IP: {client_ip}")
+        logging.info(f"Cliente conectado desde la IP: {client_ip}")
         if self.path == '/pedido':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
@@ -114,20 +116,24 @@ class RequestHandler(BaseHTTPRequestHandler):
 
 class DualStackServer(ThreadingHTTPServer):
     def server_bind(self):
-        # Configura el socket para ser reutilizable
-        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        if self.address_family == socket.AF_INET6:
-            # Si estamos utilizando IPv6, configura el socket para aceptar conexiones IPv4 también
-            self.socket.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_V6ONLY, 0)
-        ThreadingHTTPServer.server_bind(self)
+        try:
+            # Configura el socket para ser reutilizable
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            if self.address_family == socket.AF_INET6:
+                # Si estamos utilizando IPv6, configura el socket para aceptar conexiones IPv4 también
+                self.socket.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_V6ONLY, 0)
+            ThreadingHTTPServer.server_bind(self)
+        except Exception as e:
+            logging.error(f"Conexión rechazada: {e}")
+            raise
 
 
 def start_http_server():
-    server_address = ('', SERVER_PORT)
+    server_address = ('', 8080)
 
     httpd = DualStackServer(server_address, RequestHandler)
 
-    print(f'Starting HTTP server on port {SERVER_PORT}\n')
+    print(f'Starting HTTP server on {server_address[0]}:{server_address[1]}')
     httpd.serve_forever()
 
 
