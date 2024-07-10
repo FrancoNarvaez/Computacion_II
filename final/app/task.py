@@ -24,6 +24,7 @@ def check_ingredients(order_dict):
         producto = producto_dict['producto']
         cantidad = producto_dict['cantidad']
         if ingredientes[producto] < cantidad:
+            producto_dict['estado'] = 'Insuficiente'
             order_dict['estado'] = 'Insuficiente'
             return order_dict
     order_dict['estado'] = 'Por preparar'
@@ -37,18 +38,21 @@ def prepare(order_dict):
             prepare_function = product_to_function.get(product['producto'])
             if prepare_function:
                 tasks.append(prepare_function.s(product))
-        job = group(*tasks)
-        results = job.apply_async()
-        for result in results.results:
-            while result.state != 'SUCCESS':
-                time.sleep(1)
-            product_name, product_status = result.result
-            for product in order_dict['productos']:
-                if product['producto'] == product_name:
-                    product['estado'] = product_status
-                    break
+            else:
+                product['estado'] = 'Error'
+        if tasks:
+            job = group(*tasks)
+            results = job.apply_async()
+            for result in results.results:
+                while result.state != 'SUCCESS':
+                    time.sleep(1)
+                product_name, product_status = result.result
+                for product in order_dict['productos']:
+                    if product['producto'] == product_name:
+                        product['estado'] = product_status
+                        break
         if all(product.get('estado') == 'Completado' for product in order_dict['productos']):
             order_dict['estado'] = 'Completado'
         else:
             order_dict['estado'] = 'Error'
-        return order_dict
+    return order_dict
