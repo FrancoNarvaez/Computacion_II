@@ -1,0 +1,161 @@
+{
+	"info": {
+		"_postman_id": "3b1862ab-dd16-43bf-9262-a30362a606fa",
+		"name": "Compu2FinalCocina",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26833259"
+	},
+	"item": [
+		{
+			"name": "IPV4",
+			"item": [
+				{
+					"name": "Menu",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/menu",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"menu"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/status/c3c78584-d1b7-420a-bc9c-5bc851703637",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"status",
+								"c3c78584-d1b7-420a-bc9c-5bc851703637"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Pedido",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productos\": [\n        {\n            \"producto\": \"Hamburguesa\",\n            \"cantidad\": 4\n        },\n        {\n            \"producto\": \"Pizza\",\n            \"cantidad\": 4\n        },\n        {\n            \"producto\": \"Ensalada\",\n            \"cantidad\": 4\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/pedido",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"pedido"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "IPV6",
+			"item": [
+				{
+					"name": "Menu",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://[::1]:8080/menu",
+							"protocol": "http",
+							"host": [
+								"[::1]"
+							],
+							"port": "8080",
+							"path": [
+								"menu"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://[::1]:8080/status/e79d2ecd-b66c-4fd8-a234-504f428f3b80",
+							"protocol": "http",
+							"host": [
+								"[::1]"
+							],
+							"port": "8080",
+							"path": [
+								"status",
+								"e79d2ecd-b66c-4fd8-a234-504f428f3b80"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Pedido",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productos\": [\n        {\n            \"producto\": \"Hamburguesa\",\n            \"cantidad\": 6\n        },\n        {\n            \"producto\": \"Pizza\",\n            \"cantidad\": 6\n        },\n        {\n            \"producto\": \"Ensalada\",\n            \"cantidad\": 6\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://[::1]:8080/pedido",
+							"protocol": "http",
+							"host": [
+								"[::1]"
+							],
+							"port": "8080",
+							"path": [
+								"pedido"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
