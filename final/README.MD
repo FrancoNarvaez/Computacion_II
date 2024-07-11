@@ -1,6 +1,6 @@
 # Sistema de Gestión de Pedidos
 
-Este proyecto implementa un sistema de gestión de pedidos para un restaurante, permitiendo verificar los ingredientes disponibles y preparar los pedidos según la demanda.
+Este proyecto implementa un sistema de gestión de pedidos para un restaurante, permitiendo verificar los ingredientes disponibles y preparar los pedidos según la demanda. Ahora, con soporte para Docker, Docker Compose e IPV4/IPV6 permitiendo la configuración y ejecución del proyecto de manera simplificada, facilitando su despliegue y pruebas.
 
 ## Características
 
@@ -8,57 +8,33 @@ Este proyecto implementa un sistema de gestión de pedidos para un restaurante, 
 - Asignación de estados a los productos y pedidos según su disponibilidad y proceso de preparación.
 - Ejecución de tareas de preparación de productos en paralelo utilizando Celery.
 - Gestión de múltiples clientes y pedidos a través de hilos.
+- Soporte para Docker y Docker Compose para una fácil configuración y despliegue.
+- API consumible a través de Postman para pruebas y gestión de pedidos.
 
 ## Tecnologías Utilizadas
 
 - Python: Lenguaje de programación principal.
 - Celery: Biblioteca de Python para ejecutar tareas asíncronas distribuidas.
 - Threading: Módulo de Python para ejecutar múltiples hilos de ejecución.
+- Docker y Docker Compose: Para contenerizar y gestionar los componentes del proyecto.
+- Postman: Para consumir y probar la API del proyecto.
 
-## Estructura del Proyecto
+## Configuración con Docker
 
-- `app/clients.py`: Gestiona la comunicación con los clientes y el envío de pedidos.
-- `app/task.py`: Define las tareas de verificación de ingredientes y preparación de pedidos.
-- `app/despensa.py`: Almacena la información sobre los ingredientes disponibles.
-- `app/celery_app.py`: Configura la aplicación Celery para la ejecución de tareas asíncronas.
+Para ejecutar el proyecto utilizando Docker y Docker Compose, sigue estos pasos:
 
-## Configuración
+1. Asegúrate de tener Docker y Docker Compose instalados en tu sistema.
+2. Asegúrate de tener corriendo el servicio de Docker y Docker-Compopose tu sistema.
+2. Clona el repositorio del proyecto y navega hasta la carpeta del mismo.
+3. Ejecuta `docker-compose up --build` para construir y levantar los contenedores de Flask y Celery.
 
-1. Instalar las dependencias del proyecto:
+Esto iniciará todos los servicios necesarios para el proyecto, incluyendo la base de datos y cualquier otro servicio definido en tu `docker-compose.yml`.
 
-```bash
-pip install -r requirements.txt
-```
+## Uso con Postman
 
-2. Ejecutar el servidor de Redis:
+Para consumir la API del proyecto con Postman:
 
-```bash
-redis-server
-```
-
-3. Ejecutar el servidor de Celery:
-
-```bash
-celery -A app.celery_app worker --loglevel=info
-```
-
-4. Ejecutar el script principal:
-
-```bash
-python run.py
-```
-
-## Uso
-
-1. Iniciar el servidor y esperar a que los clientes realicen pedidos.
-2. Verificar cómo se procesan los pedidos y se preparan los productos en paralelo.
-3. Observar cómo se actualiza el estado de los pedidos y productos según su disponibilidad.
-4. Finalizar la ejecución del programa con `Ctrl + C`.
-5. Verificar que no hayan tareas pendientes en el servidor de Celery.
-6. Cerrar el servidor de Redis.
-7. ```bash
-   server redis stop
-   ```
-7. Finalizar la ejecución del programa.
-8. ¡Listo!
-
+1. Asegúrate de que los contenedores de Docker estén corriendo.
+2. Abre Postman y configura una nueva petición apuntando a la URL del servicio Flask, por ejemplo, `http://localhost:8080/api/pedidos`.
+3. Configura el método HTTP adecuado (GET, POST, etc.) y añade cualquier dato necesario en el cuerpo de la petición para simular un pedido.
+4. Envía la petición y observa la respuesta de la API para verificar el estado del pedido o cualquier otra información relevante.
