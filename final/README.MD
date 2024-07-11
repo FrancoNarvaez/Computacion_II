@@ -56,6 +56,9 @@ python run.py
 4. Finalizar la ejecución del programa con `Ctrl + C`.
 5. Verificar que no hayan tareas pendientes en el servidor de Celery.
 6. Cerrar el servidor de Redis.
+7. ```bash
+   server redis stop
+   ```
 7. Finalizar la ejecución del programa.
 8. ¡Listo!
 
