@@ -36,7 +36,6 @@ def init_app(app):
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
-
     @app.route('/pedido', methods=['POST'])
     def create_order():
         params = request.json

@@ -9,13 +9,19 @@ FROM python:3.10-slim
 # Establecer el directorio de trabajo
 WORKDIR /app
 
-# Copiar los archivos de requerimientos y instalar las dependencias
+# Copy the requirements file
 COPY requirements.txt requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+
+# Install dependencies
+RUN python -m venv /venv && \
+           /venv/bin/pip install --no-cache-dir -r requirements.txt
+
 
 # Copiar todo el contenido del proyecto a /app
 COPY . .
 
-# Comando para iniciar el worker de Celery
-CMD ["celery", "-A", "app.celery_app", "worker", "--loglevel=info"]
+# Set the environment variables for Celery
+ENV PATH="/venv/bin:$PATH"
 
+# Comando para iniciar el worker de Celery usando el entorno virtual
+CMD ["/venv/bin/celery", "-A", "app.celery_app", "worker", "--loglevel=info"]

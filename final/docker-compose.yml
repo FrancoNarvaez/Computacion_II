@@ -1,6 +1,12 @@
 version: '3'
 
 services:
+  redis:
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
+
+
   web:
     build:
       context: .
@@ -14,7 +20,8 @@ services:
     depends_on:
       - redis
     volumes:
-      - .:/app   
+      - .:/app
+
 
   celery:
     build:
@@ -26,8 +33,6 @@ services:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     volumes:
-      - .:/app   
+      - .:/app
 
-  redis:
-    image: "redis:alpine"
 

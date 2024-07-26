@@ -3,11 +3,6 @@ import json
 import time
 
 
-def parse_arguments():
-    #Manejar aca el parceo de manera generica para no repetir codigo
-    pass
-
-
 def send_get_request(cliente_ip, cliente_port):
     server_address = cliente_ip
     server_port = cliente_port

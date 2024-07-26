@@ -3,24 +3,29 @@ LABEL authors="franco"
 
 ENTRYPOINT ["top", "-b"]
 
-# Usar una imagen base oficial de Python
+# Use a lightweight base image with Python
 FROM python:3.10-slim
 
-# Establecer el directorio de trabajo
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copiar los archivos de requerimientos y instalar las dependencias
+# Copy the requirements file
 COPY requirements.txt requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiar todo el contenido del proyecto a /app
+# Install dependencies
+RUN python -m venv /venv && \
+    /venv/bin/pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the application code
 COPY . .
 
-# Establecer la variable de entorno Flask
-ENV FLASK_APP=run.py
-
-# Exponer el puerto en el que la app correrá
+# Expose the port the app runs on
 EXPOSE 8080
 
-# Comando para correr la aplicación
-CMD ["flask", "run", "--host=0.0.0.0", "--port=8080"]
+# Set the environment variables for Flask
+ENV FLASK_APP=run.py
+ENV PATH="/venv/bin:$PATH"
+
+# Command to run the Flask application
+CMD ["/venv/bin/flask", "run", "--host=0.0.0.0", "--port=8080"]
+
