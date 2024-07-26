@@ -26,7 +26,8 @@ Para ejecutar el proyecto utilizando Docker y Docker Compose, sigue estos pasos:
 1. Asegúrate de tener Docker y Docker Compose instalados en tu sistema.
 2. Asegúrate de tener corriendo el servicio de Docker y Docker-Compopose tu sistema.
 2. Clona el repositorio del proyecto y navega hasta la carpeta del mismo.
-3. Ejecuta `docker-compose up --build` para construir y levantar los contenedores de Flask y Celery.
+3. Ejecuta `docker-compose down` para asegurar que los contenedores esten apagados o bajados ya que usan Volumenes para la persistencia.
+4. Ejecutar `docker-compose up --build` para construir y levantar los contenedores de Flask y Celery.
 
 Esto iniciará todos los servicios necesarios para el proyecto, incluyendo la base de datos y cualquier otro servicio definido en tu `docker-compose.yml`.
 

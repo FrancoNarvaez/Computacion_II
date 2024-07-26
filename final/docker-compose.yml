@@ -21,6 +21,8 @@ services:
       - redis
     volumes:
       - .:/app
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
 
 
   celery:
