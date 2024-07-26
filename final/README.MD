@@ -35,6 +35,6 @@ Esto iniciará todos los servicios necesarios para el proyecto, incluyendo la ba
 Para consumir la API del proyecto con Postman:
 
 1. Asegúrate de que los contenedores de Docker estén corriendo.
-2. Abre Postman y configura una nueva petición apuntando a la URL del servicio Flask, por ejemplo, `http://localhost:8080/api/pedidos`.
+2. Abre Postman y configura una nueva petición apuntando a la URL del servicio Flask, por ejemplo, `http://[::1]:8080/menu` para IPV6 o `http://localhost:8080/menu` para IPV4.
 3. Configura el método HTTP adecuado (GET, POST, etc.) y añade cualquier dato necesario en el cuerpo de la petición para simular un pedido.
 4. Envía la petición y observa la respuesta de la API para verificar el estado del pedido o cualquier otra información relevante.
