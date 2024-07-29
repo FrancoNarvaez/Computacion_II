@@ -23,6 +23,8 @@ services:
       - .:/app
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0
+    networks:
+      - ipv6_network
 
 
   celery:
@@ -36,5 +38,9 @@ services:
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     volumes:
       - .:/app
+
+networks:
+  ipv6_network:
+    enable_ipv6: true
 
 

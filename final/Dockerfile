@@ -19,4 +19,4 @@ EXPOSE 8080
 ENV FLASK_APP=run.py
 ENV PATH="/venv/bin:$PATH"
 
-CMD ["/venv/bin/gunicorn", "--bind", "0.0.0.0:8080", "app:app"]
+CMD ["/venv/bin/gunicorn", "--workers=4" , "--bind", "0.0.0.0:8080", "app:app"]
