@@ -5,6 +5,9 @@ services:
     image: "redis:latest"
     ports:
       - "6379:6379"
+    networks:
+      - ipv6_network
+      - ipv4_network
 
 
   web:
@@ -25,6 +28,7 @@ services:
       - net.ipv6.conf.all.disable_ipv6=0
     networks:
       - ipv6_network
+      - ipv4_network
 
 
   celery:
@@ -38,9 +42,15 @@ services:
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     volumes:
       - .:/app
+    networks:
+      - ipv6_network
+      - ipv4_network
 
 networks:
   ipv6_network:
     enable_ipv6: true
+    driver: bridge
+  ipv4_network:
+    driver: bridge
 
 
